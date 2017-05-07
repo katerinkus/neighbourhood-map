@@ -64,6 +64,14 @@ img {
   border-bottom: 1px solid #E0E0E0;
 }
 
+a {
+    text-decoration: none;
+}
+
+select {
+    height: 20px;
+}
+
 #hide-list {
     float:right;
     background-color: #64e3e4;
@@ -93,6 +101,7 @@ h1 {
     -webkit-transform: translate(-600px, 0);
     transform: translate(-600px, 0);
     top: 0%;
+    width: 100%;
   }
 
   .navigation-list {
