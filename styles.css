@@ -1,0 +1,99 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  font-family: "Quicksand";
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+#map {
+    background-color: red;
+    width: 100%;
+    height: 100%;
+}
+
+img {
+    width: 100%;
+}
+
+.navigation {
+  width: 100%;
+  margin: auto;
+}
+
+.navigation-list {
+  list-style: none;
+  margin: 0;
+  padding: 5;
+  text-align: center;
+  position: absolute;
+  background-color: white;
+  border: 1px solid gray;
+  width: 25%;
+  top: 0%;
+}
+
+.navigation-item {
+  padding: 4px;
+  margin: 0 1px;
+  display: list-item;
+  width: 90%;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+h1 {
+    color: #64e3e4;
+    text-align: right;
+    margin: 2px;
+}
+
+.header-menu {
+  display: none;
+}
+
+@media screen and (max-width: 470px) {
+  /*HAMBURGER ICON USING UDACITY SAMPLE*/
+  .navigation {
+    z-index: 1;
+    width: 400px;
+    position: absolute;
+    /* This trasform moves the drawer off canvas. */
+    -webkit-transform: translate(-300px, 0);
+    transform: translate(-300px, 0);
+    /* Optionally, we animate the drawer. */
+    transition: transform 0.3s ease;
+  }
+  .navigation.open {
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+  .navigation-item {
+    display: list-item;
+    border-bottom: 1px solid #E0E0E0;
+    width: 100%;
+    text-align: left;
+  }
+  .header-menu {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 1em;
+  }
+  .header-menu svg {
+    width: 32px;
+    fill: gray;
+  }
+}
