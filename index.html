@@ -4,13 +4,48 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial scale=1">
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="styles.css">
     <link href='https://fonts.googleapis.com/css?family=Quicksand:400,300,700' rel='stylesheet' type='text/css'>
     <title>Portland trip</title>
 </head>
 <body>
     <header>
-    <h1>Portland trip></h1>
+        <h1>Portland trip</h1>
+        <a id="menu" class="header-menu">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"/>
+          </svg>
+        </a>
     </header>
+    <main>
+        <nav id="drawer" class="navigation">
+            <ul class="navigation-list">
+                <li class="navigation-item">List:</li>
+                <li class="navigation-item"><a class="link" href="#">Location 2</a></li>
+                <li class="navigation-item"><a class="link" href="#">Location 3</a></li>
+            </ul>
+        </nav>
+        <div class="container">
+            <section id="map">
+                <img src="https://unsplash.it/700/300">
+            </section>
+        </div>
+    </main>
+    <script>
+      /*
+       * This script was created not by me. I copied it from Udacity quiz.
+       */
+      var menu = document.querySelector('#menu');
+      var main = document.querySelector('main');
+      var drawer = document.querySelector('.navigation');
+
+      menu.addEventListener('click', function(e) {
+        drawer.classList.toggle('open');
+        e.stopPropagation();
+      });
+      main.addEventListener('click', function() {
+        drawer.classList.remove('open');
+      });
+    </script>
 </body>
 </html>
