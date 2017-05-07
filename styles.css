@@ -90,10 +90,34 @@ h1 {
   display: none;
 }
 
-/* R E S P O N S I V E  P A R T*/
+#hide-list {
+    display: none;
+}
 
-@media screen and (max-width: 470px) {
-  /*HAMBURGER ICON USING UDACITY SAMPLE*/
+/* R E S P O N S I V E  P A R T*/
+@media screen and (max-width: 680px) {
+    h1 {
+        font-size: 25px;
+        margin-left: 30%;
+    }
+
+    select {
+        font-size: 25px;
+        height: 40px;
+    }
+
+    #difficulty-level {
+        font-size: 25px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+  /*HAMBURGER ICON USING MODIFIED UDACITY SAMPLE*/
+
+  header {
+      height: 80px;
+  }
+
   .navigation {
     z-index: 1;
     position: absolute;
@@ -116,6 +140,9 @@ h1 {
     display: list-item;
     width: 100%;
     text-align: left;
+    font-size: 20px;
+    padding-bottom: 15px;
+    padding-top: 15px;
   }
   .header-menu {
     display: inline-block;
@@ -128,4 +155,19 @@ h1 {
     width: 32px;
     fill: gray;
   }
+
+  .hikePhotos img {
+      width: 200px;
+      max-height: 200px;
+  }
+}
+
+@media screen and (max-width: 280px) {
+    h1 {
+        font-size: 20px;
+    }
+
+    header {
+        height: 60px;
+    }
 }

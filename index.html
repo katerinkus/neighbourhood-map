@@ -10,16 +10,18 @@
 </head>
 <body>
     <header>
-        <h1>Hikes ideas for summer 2017</h1>
-        <a id="menu" class="header-menu">
+        <h1>Hike ideas for summer 2017</h1>
+        <a id="menu" class="header-menu" data-bind="click: openMenu">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"/>
           </svg>
         </a>
     </header>
     <main>
-        <nav id="drawer" class="navigation">
-            <!-- <li class="navigation-item">List:<button id="hide-list">Hide <strong>x</strong></button></li> -->
+        <nav id="drawer" class="navigation" data-bind="css: { open: menuVisible }">
+            <div class="navigation-item">
+                List of hikes:<button id="hide-list" data-bind="click: closeMenu">Hide <strong>x</strong></button>
+            </div>
             <div id = "difficulty-level">
                 <strong>Difficulty</strong>
                 <select data-bind="options: levels,
@@ -29,7 +31,7 @@
 
             <ul class="navigation-list" data-bind="foreach: filteredHikeList">
                 <li class="navigation-item">
-                    <a class="link" href="#" data-bind="text: name"></a>
+                    <a class="link" href="#" data-bind="text: name, click: $root.openHike"></a>
                 </li>
             </ul>
         </nav>
@@ -40,13 +42,28 @@
     <script src="js/knockout-3.4.2.js"></script>
 
     <script>
-        var map, markers = {};
+        // These will contain the map, and all markers and their info windows.
+        var map, markers = {}, infowindows = [];
 
+        // knockout VM
         function HikeViewModel() {
             var self = this;
 
+            // Hamburger icon menu toggling
+            self.menuVisible = ko.observable(false);
+
+            self.openMenu = function () {
+                self.menuVisible(true);
+            }
+
+            self.closeMenu = function () {
+                self.menuVisible(false);
+            }
+
+            // Filter levels
             self.levels = ["Easy", "Medium", "Hard", "Extreme"];
 
+            // hike data, our "model"
             self.hikeList = [
                 { name: "Elsay Lake", difficulty: "Extreme", distance: 20, coords: {lat: 49.415956, lng: -122.932207}},
                 { name: "Lindsay Lake Loop", difficulty: "Hard", distance: 10, coords: {lat: 49.346459, lng: -122.826283}},
@@ -57,17 +74,113 @@
                 { name: "Howe Sound Crest trail", difficulty: "Hard", coords: {lat: 49.456665, lng: -123.188288}}
             ];
 
+            // user selection
             self.selectedDifficultyLevel = ko.observable();
 
-            self.filteredHikeList = ko.computed(function() {
-                var setMapOnMarkers = function (map, markersMap) {
-                    console.log(markersMap);
-                    var ms = Object.values(markersMap);
-                    for (var i = 0; i < ms.length; i++) {
-                        ms[i].setMap(map);
-                    }
+            // creates a marker, and its info window after downloading a photo from
+            // flickr search api
+            self.getMarkerInfoContent = function (hikeName, callback) {
+                // info window template
+                var contentHtml = "<h2>" + hikeName + "</h2>";
+                contentHtml += "<div class='hikePhotos'>"
+                contentHtml += "<img src='%PHOTO_URL%' />"
+                contentHtml += "</div>";
+
+                // api urls
+                var flickrSearchUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=947cf5b151371e5150e63b4d589c58fb&text=" + hikeName + "&format=json&nojsoncallback=1";
+
+                var flickrPhotoByIdUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=947cf5b151371e5150e63b4d589c58fb&photo_id=PHOTO_ID&format=json&nojsoncallback=1";
+
+                // download list of photos matching hike name
+                // todo better error reporting. right now it's just alert box
+                $.getJSON(flickrSearchUrl)
+                    .done(function (data) {
+                        // we'll use first photo out of the list
+                        var photo1 = data.photos.photo[0];
+
+                        // now we need to find photo's url by id
+                        $.getJSON(flickrPhotoByIdUrl.replace("PHOTO_ID", photo1.id))
+                            .done(function (photoSizes) {
+                                callback(
+                                    contentHtml.replace("%PHOTO_URL%", photoSizes.sizes.size[4].source)
+                                );
+                            })
+
+                            .fail(function () {
+                                alert("Error fetching photo information");
+                            })
+                    })
+
+                    .fail(function () {
+                        alert("Error searching flickr for photos");
+                    });
+            }
+
+            self.createMarker = function (coords, hikeName) {
+                // create marker
+                var marker = new google.maps.Marker({
+                  position: coords,
+                  map: map
+                });
+
+                // this function will be called once we finished downloading images
+                // from flickr api. it will create an info window, and add click listeners
+                // for the marker which open the info window
+                var createInfoContentAfterDownloadImages = function (infoContent) {
+                    var infowindow = new google.maps.InfoWindow({
+                        content: infoContent
+                    });
+
+                    // we need to keep track of infowindows, so that we can close them
+                    infowindows.push(infowindow);
+
+                    // when marker is clicked, display its infowindow
+                    marker.addListener('click', function() {
+                        // but first, hide all infowindows
+                        for (var i = 0; i < infowindows.length; i++) {
+                            infowindows[i].close();
+                        }
+                        infowindow.open(map, this);
+                    });
                 }
 
+                self.getMarkerInfoContent(hikeName, createInfoContentAfterDownloadImages);
+
+                return marker;
+            }
+
+            self.openHike = function (hike) {
+                // find our marker for this hike
+                var hikeMarker = markers[hike.name];
+
+                // center the map to marker's position
+                map.setCenter(hikeMarker.getPosition());
+
+                // make it bouncy
+                hikeMarker.setAnimation(google.maps.Animation.BOUNCE);
+
+                // stop bouncing after one bounce, which takes about 750ms
+                setTimeout(function () {
+                    hikeMarker.setAnimation(null);
+                }, 750);
+
+                // 'click' on the marker
+                new google.maps.event.trigger(hikeMarker, 'click');
+            }
+
+            // helper function
+            // sets the "map" object on each marker
+            // to hide a marker, we need to set its "map" to null
+            self.setMapOnMarkers = function (map, markersMap) {
+                var ms = Object.values(markersMap);
+                for (var i = 0; i < ms.length; i++) {
+                    ms[i].setMap(map);
+                }
+            };
+
+            // this is the list that is actually displayed on the screen
+            // this also controls which map markers are displayed
+            self.filteredHikeList = ko.computed(function() {
                 var filtered = [];
 
                 for (var i = 0; i < self.hikeList.length; i++) {
@@ -78,7 +191,7 @@
                 }
 
                 // Hide all markers first.
-                setMapOnMarkers(null, markers);
+                self.setMapOnMarkers(null, markers);
 
                 // Display markers for each hike in 'filtered' array.
                 for (var i = 0; i < filtered.length; i++) {
@@ -91,31 +204,13 @@
                     // If we didn't create a marker before, create it and show.
                     // And place it into our markers list.
                     } else {
-                        markers[hike.name] = new google.maps.Marker({
-                          position: filtered[i].coords,
-                          map: map
-                        });
+                        markers[hike.name] = self.createMarker(filtered[i].coords, hike.name);
                     }
                 }
 
                 return filtered;
             });
         }
-
-      /*
-       * This script was created not by me. I copied it from Udacity quiz.
-       */
-      var menu = document.querySelector('#menu');
-      var main = document.querySelector('main');
-      var drawer = document.querySelector('.navigation');
-
-      menu.addEventListener('click', function(e) {
-        drawer.classList.toggle('open');
-        e.stopPropagation();
-      });
-      main.addEventListener('click', function() {
-        drawer.classList.remove('open');
-      });
 
       function initMap() {
         var northShore = {lat: 49.414670, lng: -123.146046};
@@ -127,6 +222,7 @@
         ko.applyBindings(new HikeViewModel());
       }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcn3D0x7Cflmm87XgDM8sAQQ-YMUCLyaU&callback=initMap"></script>
 </body>
 </html>
