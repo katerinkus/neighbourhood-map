@@ -19,19 +19,85 @@
     </header>
     <main>
         <nav id="drawer" class="navigation">
-            <ul class="navigation-list">
-                <li class="navigation-item">List:</li>
-                <li class="navigation-item"><a class="link" href="#">Location 2</a></li>
-                <li class="navigation-item"><a class="link" href="#">Location 3</a></li>
+            <!-- <li class="navigation-item">List:<button id="hide-list">Hide <strong>x</strong></button></li> -->
+            <div>
+                <strong>difficulty</strong>
+                <select data-bind="options: levels,
+                    optionsCaption: 'Select a level...',
+                    value: selectedDifficultyLevel"></select>
+            </div>
+
+            <ul class="navigation-list" data-bind="foreach: filteredHikeList">
+                <li class="navigation-item">
+                    <a class="link" href="#" data-bind="text: name"></a>
+                </li>
             </ul>
         </nav>
         <div class="container">
-            <section id="map">
-                <img src="https://unsplash.it/700/300">
-            </section>
+            <section id="map"></section>
         </div>
     </main>
+    <script src="js/knockout-3.4.2.js"></script>
+
     <script>
+        var map, markers = {};
+
+        function HikeViewModel() {
+            var self = this;
+
+            self.levels = ["Easy", "Medium", "Hard", "Extreme"];
+
+            self.hikeList = [
+                { name: "Elsay Lake", difficulty: "Extreme", distance: 20, coords: {lat: 49.415956, lng: -122.932207}},
+                { name: "Brunswick", difficulty: "Hard", distance: 10, coords: {lat: 49.491198, lng: -123.202538}},
+                { name: "Eagle Bluffs", difficulty: "Easy", distance: 5, coords: {lat: 49.387072, lng: -123.211685} }
+            ];
+
+            self.selectedDifficultyLevel = ko.observable();
+
+            self.filteredHikeList = ko.computed(function() {
+                var setMapOnMarkers = function (map, markersMap) {
+                    console.log(markersMap);
+                    var ms = Object.values(markersMap);
+                    for (var i = 0; i < ms.length; i++) {
+                        ms[i].setMap(map);
+                    }
+                }
+
+                var filtered = [];
+
+                for (var i = 0; i < self.hikeList.length; i++) {
+                    var hike = self.hikeList[i];
+                    if (self.selectedDifficultyLevel() === undefined || hike.difficulty === self.selectedDifficultyLevel()) {
+                        filtered.push(hike);
+                    }
+                }
+
+                // Hide all markers first.
+                setMapOnMarkers(null, markers);
+
+                // Display markers for each hike in 'filtered' array.
+                for (var i = 0; i < filtered.length; i++) {
+                    var hike = filtered[i];
+
+                    // Show marker if we already created it before.
+                    if (markers[hike.name]) {
+                        markers[hike.name].setMap(map);
+
+                    // If we didn't create a marker before, create it and show.
+                    // And place it into our markers list.
+                    } else {
+                        markers[hike.name] = new google.maps.Marker({
+                          position: filtered[i].coords,
+                          map: map
+                        });
+                    }
+                }
+
+                return filtered;
+            });
+        }
+
       /*
        * This script was created not by me. I copied it from Udacity quiz.
        */
@@ -46,6 +112,17 @@
       main.addEventListener('click', function() {
         drawer.classList.remove('open');
       });
+
+      function initMap() {
+        var northShore = {lat: 49.414670, lng: -123.146046};
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: northShore
+        });
+
+        ko.applyBindings(new HikeViewModel());
+      }
     </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcn3D0x7Cflmm87XgDM8sAQQ-YMUCLyaU&callback=initMap"></script>
 </body>
 </html>
