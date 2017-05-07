@@ -1,5 +1,6 @@
 // These will contain the map, and all markers and their info windows.
-var map, markers = {}, infowindows = [];
+var map, markers = {},
+    infowindows = [];
 
 // knockout VM
 function HikeViewModel() {
@@ -8,26 +9,78 @@ function HikeViewModel() {
     // Hamburger icon menu toggling
     self.menuVisible = ko.observable(false);
 
-    self.openMenu = function () {
+    self.openMenu = function() {
         self.menuVisible(true);
-    }
+    };
 
-    self.closeMenu = function () {
+    self.closeMenu = function() {
         self.menuVisible(false);
-    }
+    };
 
     // Filter levels
     self.levels = ["Easy", "Medium", "Hard", "Extreme"];
 
     // hike data, our "model"
-    self.hikeList = [
-        { name: "Elsay Lake", difficulty: "Extreme", distance: 20, coords: {lat: 49.415956, lng: -122.932207}},
-        { name: "Lindsay Lake Loop", difficulty: "Hard", distance: 10, coords: {lat: 49.346459, lng: -122.826283}},
-        { name: "Eagle Bluffs", difficulty: "Easy", distance: 5, coords: {lat: 49.387072, lng: -123.211685}},
-        { name: "Elk Mountain", difficulty: "Medium", distance: 5, coords: {lat: 49.114344, lng: -121.807145}},
-        { name: "Murrin Provincial Park", difficulty: "Easy", coords: {lat: 49.646566, lng: -123.209304}},
-        { name: "Mount Cheam Peak", difficulty: "Medium", coords: {lat: 49.186288, lng: -121.682589}},
-        { name: "Howe Sound Crest trail", difficulty: "Hard", coords: {lat: 49.456665, lng: -123.188288}}
+    self.hikeList = [{
+            name: "Elsay Lake",
+            difficulty: "Extreme",
+            distance: 20,
+            coords: {
+                lat: 49.415956,
+                lng: -122.932207
+            }
+        },
+        {
+            name: "Lindsay Lake Loop",
+            difficulty: "Hard",
+            distance: 10,
+            coords: {
+                lat: 49.346459,
+                lng: -122.826283
+            }
+        },
+        {
+            name: "Eagle Bluffs",
+            difficulty: "Easy",
+            distance: 5,
+            coords: {
+                lat: 49.387072,
+                lng: -123.211685
+            }
+        },
+        {
+            name: "Elk Mountain",
+            difficulty: "Medium",
+            distance: 5,
+            coords: {
+                lat: 49.114344,
+                lng: -121.807145
+            }
+        },
+        {
+            name: "Murrin Provincial Park",
+            difficulty: "Easy",
+            coords: {
+                lat: 49.646566,
+                lng: -123.209304
+            }
+        },
+        {
+            name: "Mount Cheam Peak",
+            difficulty: "Medium",
+            coords: {
+                lat: 49.186288,
+                lng: -121.682589
+            }
+        },
+        {
+            name: "Howe Sound Crest trail",
+            difficulty: "Hard",
+            coords: {
+                lat: 49.456665,
+                lng: -123.188288
+            }
+        }
     ];
 
     // user selection
@@ -35,11 +88,11 @@ function HikeViewModel() {
 
     // creates a marker, and its info window after downloading a photo from
     // flickr search api
-    self.getMarkerInfoContent = function (hikeName, callback) {
+    self.getMarkerInfoContent = function(hikeName, callback) {
         // info window template
         var contentHtml = "<h2>" + hikeName + "</h2>";
-        contentHtml += "<div class='hikePhotos'>"
-        contentHtml += "<img src='%PHOTO_URL%' />"
+        contentHtml += "<div class='hikePhotos'>";
+        contentHtml += "<img src='%PHOTO_URL%' />";
         contentHtml += "</div>";
 
         // api urls
@@ -50,29 +103,29 @@ function HikeViewModel() {
         // download list of photos matching hike name
         // todo better error reporting. right now it's just alert box
         $.getJSON(flickrSearchUrl)
-        .done(function (data) {
-            // we'll use first photo out of the list
-            var photo1 = data.photos.photo[0];
+            .done(function(data) {
+                // we'll use first photo out of the list
+                var photo1 = data.photos.photo[0];
 
-            // now we need to find photo's url by id
-            $.getJSON(flickrPhotoByIdUrl.replace("PHOTO_ID", photo1.id))
-            .done(function (photoSizes) {
-                callback(
-                    contentHtml.replace("%PHOTO_URL%", photoSizes.sizes.size[4].source)
-                );
+                // now we need to find photo's url by id
+                $.getJSON(flickrPhotoByIdUrl.replace("PHOTO_ID", photo1.id))
+                    .done(function(photoSizes) {
+                        callback(
+                            contentHtml.replace("%PHOTO_URL%", photoSizes.sizes.size[4].source)
+                        );
+                    })
+
+                    .fail(function() {
+                        alert("Error fetching photo information");
+                    });
             })
 
-            .fail(function () {
-                alert("Error fetching photo information");
-            })
-        })
+            .fail(function() {
+                alert("Error searching flickr for photos");
+            });
+    };
 
-        .fail(function () {
-            alert("Error searching flickr for photos");
-        });
-    }
-
-    self.createMarker = function (coords, hikeName) {
+    self.createMarker = function(coords, hikeName) {
         // create marker
         var marker = new google.maps.Marker({
             position: coords,
@@ -82,7 +135,7 @@ function HikeViewModel() {
         // this function will be called once we finished downloading images
         // from flickr api. it will create an info window, and add click listeners
         // for the marker which open the info window
-        var createInfoContentAfterDownloadImages = function (infoContent) {
+        var createInfoContentAfterDownloadImages = function(infoContent) {
             var infowindow = new google.maps.InfoWindow({
                 content: infoContent
             });
@@ -98,14 +151,14 @@ function HikeViewModel() {
                 }
                 infowindow.open(map, this);
             });
-        }
+        };
 
         self.getMarkerInfoContent(hikeName, createInfoContentAfterDownloadImages);
 
         return marker;
-    }
+    };
 
-    self.openHike = function (hike) {
+    self.openHike = function(hike) {
         // close menu if on mobile viewport
         var width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
         if (width <= 580) {
@@ -122,18 +175,18 @@ function HikeViewModel() {
         hikeMarker.setAnimation(google.maps.Animation.BOUNCE);
 
         // stop bouncing after one bounce, which takes about 750ms
-        setTimeout(function () {
+        setTimeout(function() {
             hikeMarker.setAnimation(null);
         }, 750);
 
         // 'click' on the marker
-        new google.maps.event.trigger(hikeMarker, 'click');
-    }
+        var markerEvent = new google.maps.event.trigger(hikeMarker, 'click');
+    };
 
     // helper function
     // sets the "map" object on each marker
     // to hide a marker, we need to set its "map" to null
-    self.setMapOnMarkers = function (map, markersMap) {
+    self.setMapOnMarkers = function(map, markersMap) {
         var ms = Object.values(markersMap);
         for (var i = 0; i < ms.length; i++) {
             ms[i].setMap(map);
@@ -144,9 +197,10 @@ function HikeViewModel() {
     // this also controls which map markers are displayed
     self.filteredHikeList = ko.computed(function() {
         var filtered = [];
+        var hike;
 
         for (var i = 0; i < self.hikeList.length; i++) {
-            var hike = self.hikeList[i];
+            hike = self.hikeList[i];
             if (self.selectedDifficultyLevel() === undefined || hike.difficulty === self.selectedDifficultyLevel()) {
                 filtered.push(hike);
             }
@@ -156,8 +210,8 @@ function HikeViewModel() {
         self.setMapOnMarkers(null, markers);
 
         // Display markers for each hike in 'filtered' array.
-        for (var i = 0; i < filtered.length; i++) {
-            var hike = filtered[i];
+        for (var j = 0; j < filtered.length; j++) {
+            hike = filtered[j];
 
             // Show marker if we already created it before.
             if (markers[hike.name]) {
@@ -166,7 +220,7 @@ function HikeViewModel() {
                 // If we didn't create a marker before, create it and show.
                 // And place it into our markers list.
             } else {
-                markers[hike.name] = self.createMarker(filtered[i].coords, hike.name);
+                markers[hike.name] = self.createMarker(filtered[j].coords, hike.name);
             }
         }
 
@@ -175,7 +229,10 @@ function HikeViewModel() {
 }
 
 function initMap() {
-    var northShore = {lat: 49.343056, lng: -122.801406};
+    var northShore = {
+        lat: 49.343056,
+        lng: -122.801406
+    };
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 8,
         center: northShore

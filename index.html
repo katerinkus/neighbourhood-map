@@ -1,19 +1,21 @@
 <!DOCTYPE HTML>
 <html lang=en>
+
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial scale=1">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/styles.min.css">
+    <link rel="stylesheet" href="css/responsive.min.css">
     <link href='https://fonts.googleapis.com/css?family=Quicksand:400,300,700' rel='stylesheet' type='text/css'>
-    <title>Hikes ideas</title>
+    <title>Hike Ideas</title>
 </head>
+
 <body>
     <header>
         <h1>Hike ideas for summer 2017</h1>
         <a id="menu" class="header-menu" data-bind="click: openMenu">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"/>
           </svg>
         </a>
@@ -23,7 +25,7 @@
             <div class="navigation-item">
                 List of hikes:<button id="hide-list" data-bind="click: closeMenu">Hide <strong>x</strong></button>
             </div>
-            <div id = "difficulty-level">
+            <div id="difficulty-level">
                 <strong>Difficulty</strong>
                 <select data-bind="options: levels,
                     optionsCaption: 'Select level...',
@@ -41,8 +43,9 @@
         </div>
     </main>
     <script src="js/knockout-3.4.2.js"></script>
-    <script src="js/mapbuilder.js"></script>
+    <script src="js/mapbuilder.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcn3D0x7Cflmm87XgDM8sAQQ-YMUCLyaU&callback=initMap"></script>
 </body>
+
 </html>
