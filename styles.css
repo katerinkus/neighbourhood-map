@@ -17,6 +17,10 @@ main {
     height: 100%;
 }
 
+select {
+    font-family: "Quicksand", Arial, sans-serif;
+}
+
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -68,18 +72,6 @@ a {
     text-decoration: none;
 }
 
-select {
-    height: 20px;
-}
-
-#hide-list {
-    float:right;
-    background-color: #64e3e4;
-    border-radius: 5px;
-    border: 0px;
-    color: white;
-}
-
 h1 {
     color: #64e3e4;
     text-align: right;
@@ -111,8 +103,18 @@ h1 {
     }
 }
 
-@media screen and (max-width: 500px) {
-  /*HAMBURGER ICON USING MODIFIED UDACITY SAMPLE*/
+@media screen and (max-width: 580px) {
+
+  #hide-list {
+      float:right;
+      background-color: #64e3e4;
+      border-radius: 5px;
+      border: 0px;
+      color: white;
+      display: block;
+  }
+
+    /*HAMBURGER ICON USING MODIFIED UDACITY SAMPLE*/
 
   header {
       height: 80px;

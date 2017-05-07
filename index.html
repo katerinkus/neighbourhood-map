@@ -150,6 +150,12 @@
             }
 
             self.openHike = function (hike) {
+                // close menu if on mobile viewport
+                var width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+                if (width <= 580) {
+                    self.menuVisible(false);
+                }
+
                 // find our marker for this hike
                 var hikeMarker = markers[hike.name];
 
@@ -213,9 +219,9 @@
         }
 
       function initMap() {
-        var northShore = {lat: 49.414670, lng: -123.146046};
+        var northShore = {lat: 49.343056, lng: -122.801406};
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 12,
+          zoom: 8,
           center: northShore
         });
 
