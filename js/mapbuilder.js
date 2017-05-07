@@ -234,7 +234,7 @@ function initMap() {
         lng: -122.801406
     };
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 8,
+        zoom: 7,
         center: northShore
     });
 
