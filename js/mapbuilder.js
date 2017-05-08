@@ -150,6 +150,9 @@ function HikeViewModel() {
                     infowindows[i].close();
                 }
                 infowindow.open(map, this);
+
+                // make it bouncy
+                self.bouncMarker(this);
             });
         };
 
@@ -172,16 +175,22 @@ function HikeViewModel() {
         map.setCenter(hikeMarker.getPosition());
 
         // make it bouncy
-        hikeMarker.setAnimation(google.maps.Animation.BOUNCE);
-
-        // stop bouncing after one bounce, which takes about 750ms
-        setTimeout(function() {
-            hikeMarker.setAnimation(null);
-        }, 750);
+        self.bouncMarker(hikeMarker);
 
         // 'click' on the marker
         var markerEvent = new google.maps.event.trigger(hikeMarker, 'click');
     };
+
+    // helper function to bounce the provided marker
+    self.bouncMarker = function (marker) {
+        // make it bouncy
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+
+        // stop bouncing after one bounce, which takes about 750ms
+        setTimeout(function() {
+            marker.setAnimation(null);
+        }, 750);
+    }
 
     // helper function
     // sets the "map" object on each marker
@@ -239,4 +248,14 @@ function initMap() {
     });
 
     ko.applyBindings(new HikeViewModel());
+}
+
+// Global function which Google API will call in case of auth errors.
+// See https://developers.google.com/maps/documentation/javascript/events#auth-errors
+function gm_authFailure() {
+    alert("Google Maps failed to load due to an authentication failure");
+}
+
+function mapError() {
+    alert("General error loading a map");
 }
